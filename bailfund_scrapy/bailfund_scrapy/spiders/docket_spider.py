@@ -2,6 +2,8 @@ import scrapy
 import requests
 import sys
 
+from bailfund_scrapy.items import BailfundScrapyItem
+
 class DocketViewStateSpider(scrapy.Spider):
     name = 'docketspider-viewstate'
     url = 'https://ujsportal.pacourts.us/DocketSheets/MDJ.aspx'
@@ -79,14 +81,22 @@ class DocketViewStateSpider(scrapy.Spider):
         yield {'Test': "Passed"}
 
     def parse_dockets_table(self, response):
+        from scrapy.shell import inspect_response
+        inspect_response(response, self)
         urls = response.xpath('//*[@id="ctl00_ctl00_ctl00_cphMain_cphDynamicContent_cphResults_gvDocket"]//@href').getall()
+        file_urls = []
         while('#' in urls):
             urls.remove('#')
         for url in urls[:3]:
             filename = f'{url}.pdf'
-            pdf = requests.get(f'https://ujsportal.pacourts.us/DocketSheets/{url}')
-            with open(filename, 'wb') as f:
-                f.write(pdf.content)
+            file_url = response.urljoin(url)
+            file_urls.append(file_url)
+        item = BailfundScrapyItem()
+        item['file_urls'] = file_urls
+        yield item
+            #pdf = requests.get(f'https://ujsportal.pacourts.us/DocketSheets/{url}')
+            #with open(filename, 'wb') as f:
+            #    f.write(pdf.content)
     
     def parse_results(self, response):
         for quote in response.css("div.quote"):

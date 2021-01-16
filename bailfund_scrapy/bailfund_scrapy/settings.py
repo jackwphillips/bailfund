@@ -65,7 +65,11 @@ ROBOTSTXT_OBEY = False
 #ITEM_PIPELINES = {
 #    'bailfund_scrapy.pipelines.BailfundScrapyPipeline': 300,
 #}
-
+ITEM_PIPELINES = {
+        #'bailfund_scrapy.pipelines.BailfundScrapyPipeline':2,
+        'scrapy.pipelines.files.FilesPipeline': 1
+        }
+FILES_STORE = '/home/jackwphillips/projects/bailfund/bailfund_scrapy/pdfs'
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
 #AUTOTHROTTLE_ENABLED = True
