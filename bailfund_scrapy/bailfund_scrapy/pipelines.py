@@ -5,14 +5,23 @@
 
 
 # useful for handling different item types with a single interface
-from itemadapter import ItemAdapter
+from scrapy.pipelines.files import FilesPipeline
+from scrapy import Request
+
+from pathlib import Path
+import sys
+
+class BailfundScrapyPipeline(FilesPipeline):
+    def get_media_requests(self, item, info):
+        return [Request(x, meta={'filename': item.get('file_name')}) for x in item.get(self.files_urls_field, [])]
 
 
-class BailfundScrapyPipeline:
-    def process_item(self, item, spider):
-        return item
+    def file_path(self, request, response=None, info=None, *, item=None):
+        url = request.url
+        return f'{request.meta["filename"]}'
 
-    def file_path(self, request, response=None, info=None):
-        url = request.irl
-        file_name: str = request.url.split("/")[-1]
-        return f"{file_name}.pdf"
+    def close_spider(self, spider):
+        print("#####Closing Spider#####")
+        #log = spider.crawler.stats.get_value('log_count/CRITICAL')
+        #if spider.crawler.stats.get_value('log_count/CRITICAL') > 0:
+        #    raise NameError("Error!")
