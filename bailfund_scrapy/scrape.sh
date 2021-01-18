@@ -28,3 +28,8 @@ echo
 echo Processing downloaded files
 python3 scripts/file_processer.py ./pdfs
 
+echo Parsing Files and Uploading to Airtable
+for i in pdfs/*.pdf; do python scripts/parser.py $i; done
+
+echo Cleaning up files...
+rm pdfs/*.pdf
